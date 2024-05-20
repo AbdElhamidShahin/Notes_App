@@ -1,73 +1,68 @@
-import 'dart:ui';
-
 import 'package:flutter/material.dart';
 
 import 'CustomButtom.dart';
 import 'CustomTextFeld.dart';
 
-class AddNoteBottomShaat extends StatelessWidget {
-  const AddNoteBottomShaat({super.key});
+class AddNoteBottomSheet extends StatelessWidget {
+  const AddNoteBottomSheet({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return const Padding(
-      padding: EdgeInsets.symmetric(horizontal: 15),
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 15),
       child: SingleChildScrollView(
-        child: AddNoteForm(),
+        child: const AddNoteForm(),
       ),
     );
   }
 }
 
 class AddNoteForm extends StatefulWidget {
-  const AddNoteForm({
-    super.key,
-  });
+  const AddNoteForm({super.key});
 
   @override
   State<AddNoteForm> createState() => _AddNoteFormState();
 }
 
 class _AddNoteFormState extends State<AddNoteForm> {
-  final GlobalKey<FormState> formkey = GlobalKey();
-  AutovalidateMode autovalidateMode = AutovalidateMode.disabled; //للتحقق من textFeld
-  String? title, suptitle;
+  final GlobalKey<FormState> formKey = GlobalKey<FormState>();
+  AutovalidateMode autoValidateMode = AutovalidateMode.disabled;
+  String? title, subTitle;
+
   @override
   Widget build(BuildContext context) {
     return Form(
-      key: formkey,
-      autovalidateMode: autovalidateMode,
+      key: formKey,
+      autovalidateMode: autoValidateMode,
       child: Column(
         children: [
-          const SizedBox(
-            height: 32,
-          ),
-          CustomTextFeld(
+          const SizedBox(height: 32),
+          CustomTextField(
             onSaved: (value) {
               title = value;
             },
-            hintText: 'title',
+            hintText: 'Title',
           ),
           const SizedBox(height: 16),
-          CustomTextFeld(
+          CustomTextField(
             onSaved: (value) {
-              suptitle = value;//للتححق
+              subTitle = value;
             },
-            hintText: 'contend',
+            hintText: 'Content',
             maxLines: 5,
           ),
           const SizedBox(height: 32),
-          Custom_Buttom(
+          CustomButton(
             onTap: () {
-              if (formkey.currentState!.validate()) {
-                formkey.currentState!.save();
+              if (formKey.currentState!.validate()) {
+                formKey.currentState!.save();
               } else {
-                autovalidateMode = AutovalidateMode.always;
-                setState(() {});
+                setState(() {
+                  autoValidateMode = AutovalidateMode.always;
+                });
               }
             },
           ),
-          // SizedBox(height: 8),
         ],
       ),
     );

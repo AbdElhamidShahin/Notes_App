@@ -4,10 +4,12 @@ import 'package:hive_flutter/adapters.dart';
 import 'package:noets_app/veiws/notes_veiw.dart';
 
 import 'constancs/constancs.dart';
+import 'modiel/notemodile.dart';
 
 void main() async {
   await Hive.initFlutter();
   await Hive.openBox(kNotesBox);
+  Hive.registerAdapter(NotemodileAdapter());
   runApp(const NotesApp());
 }
 

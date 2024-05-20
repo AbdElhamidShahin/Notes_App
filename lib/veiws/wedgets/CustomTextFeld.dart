@@ -2,12 +2,17 @@ import 'package:flutter/material.dart';
 
 import '../../constancs/constancs.dart';
 
-class CustomTextFeld extends StatelessWidget {
-  const CustomTextFeld(
-      {super.key, required this.hintText, this.maxLines = 1, this.onSaved});
+class CustomTextField extends StatelessWidget {
+  const CustomTextField({
+    super.key,
+    required this.hintText,
+    this.maxLines = 1,
+    this.onSaved,
+  });
   final String hintText;
   final int maxLines;
   final void Function(String?)? onSaved;
+
   @override
   Widget build(BuildContext context) {
     return TextFormField(
@@ -15,8 +20,10 @@ class CustomTextFeld extends StatelessWidget {
       cursorColor: KPrimaryColor,
       validator: (value) {
         if (value?.isEmpty ?? true) {
-          return 'Feild is requird';
-        }else {return null;}
+          return 'Field is required';
+        } else {
+          return null;
+        }
       },
       maxLines: maxLines,
       decoration: InputDecoration(
@@ -31,7 +38,7 @@ class CustomTextFeld extends StatelessWidget {
   OutlineInputBorder buildBorder([color]) {
     return OutlineInputBorder(
       borderRadius: BorderRadius.circular(8),
-      borderSide: const BorderSide(color: Colors.white),
+      borderSide: BorderSide(color: color ?? Colors.white),
     );
   }
 }

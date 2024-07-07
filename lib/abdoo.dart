@@ -1,6 +1,6 @@
-import 'package:flutter/cupertino.dart';
+import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:noets_app/veiws/notes_veiw.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,177 +10,171 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: LoginScreen(),
+      title: 'Flutter Demo',
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: MyHomePage(),
+    );
+  }
+}
+
+class MyHomePage extends StatefulWidget {
+  @override
+  _MyHomePageState createState() => _MyHomePageState();
+}
+
+class _MyHomePageState extends State<MyHomePage> {
+  int _selectedIndex = 0;
+  List<Item> _items = []; // List to hold items
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  // Function to add item to _items list
+  void _addItemToList(Item item) {
+    setState(() {
+      _items.add(item);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    List<Widget> _pages = [
+      HomePage(items: _items),
+      AddPage(onItemAdded: _addItemToList),
+    ];
+
+    return Scaffold(
+      body: _pages[_selectedIndex],
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.add),
+            label: 'Add',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
       ),
     );
   }
 }
 
-class LoginScreen extends StatefulWidget {
-  static const emailRegex = "@gmail.com";
+class HomePage extends StatefulWidget {
+  final List<Item> items; // List of items to display
+
+  HomePage({required this.items});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  _HomePageState createState() => _HomePageState();
+}
+class _HomePageState extends State<HomePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Home Page'),
+      ),
+      body: widget.items.isEmpty
+          ? Center(child: Text('No items found'))
+          : ListView.builder(
+        itemCount: widget.items.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(widget.items[index].title),
+            leading: Image.asset(
+              widget.items[index].image,
+              width: 50, // تعديل الحجم حسب الحاجة
+              height: 50,
+              fit: BoxFit.cover, // تعديل حجم الصورة لتناسب الـ ListTile
+            ),
+          );
+        },
+      ),
+    );
+  }
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+
+class AddPage extends StatelessWidget {
+  final List<Item> fixedItems = List.generate(
+    5,
+        (index) => Item(
+      title: 'Item ${index + 1}',
+      image: 'assets/images/image_processing20200106-10064-rkm2p2.jpg', // Adjust image asset path as necessary
+    ),
+  );
+
+  final Function(Item) onItemAdded; // Callback to send item to MyHomePage
+
+  AddPage({required this.onItemAdded});
+
+  _addItem(BuildContext context, Item item) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    List<String> itemsJson = prefs.getStringList('items') ?? [];
+    itemsJson.add(jsonEncode(item.toJson()));
+    await prefs.setStringList('items', itemsJson);
+
+    // Send the added item to MyHomePage using the callback
+    onItemAdded(item);
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text('${item.title} added')),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: Stack(
-        children: [
-          // الخلفية
-          Positioned.fill(
-            child: Image.asset(
-              'assets/images/image_processing20200106-10064-rkm2p2.jpg', // تأكد من وضع الصورة في مجلد assets
-              fit: BoxFit.cover,
-            ),
-          ),
-          // محتوى الشاشة
-          Column(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 20),
-                padding: EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.6),
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.email, color: Colors.white),
-                        hintText: 'Email id',
-                        hintStyle: TextStyle(color: Colors.white),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.2),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (RegExp(LoginScreen.emailRegex).hasMatch(value!)) {
-                        } else if (value == null || value.isEmpty) {
-                          return "@gmail.com";
-                        } else {
-                          return "@gmail.com";
-                        }
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    TextFormField(
-                      decoration: InputDecoration(
-                        prefixIcon: Icon(Icons.lock, color: Colors.white),
-                        hintText: 'Enter Your Password',
-                        hintStyle: TextStyle(color: Colors.white),
-                        filled: true,
-                        fillColor: Colors.white.withOpacity(0.2),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(18),
-                          borderSide: BorderSide.none,
-                        ),
-                      ),
-                      style: TextStyle(color: Colors.white),
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return "Field cannot be empty";
-                        } else if (value.length < 5) {
-                          return "Must be at least 6 chars";
-                        } else {
-                          return null;
-                        }
-                      },
-                    ),
-                    SizedBox(height: 40),
-                    Row(
-                      children: [
-                        TextButton(
-                          onPressed: () {
-                            // قم بإضافة وظيفة نسيت كلمة المرور هنا
-                          },
-                          child: Text(
-                            'Forget Password',
-                            style: TextStyle(color: Colors.white),
-                          ),
-                        ),
-                        Spacer(),
-                        SizedBox(
-                          width: 170,
-                          child: ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) => Notes_view()));
-                              } else {
-                                return null;
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              padding: EdgeInsets.symmetric(
-                                  horizontal: 50, vertical: 15),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(24),
-                              ),
-                            ),
-                            child: Text('Login',
-                                style: TextStyle(
-                                    fontSize: 18, color: Colors.white)),
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          'Register Now - ',
-                          style: TextStyle(color: Colors.white),
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.facebook, color: Colors.blue),
-                          onPressed: () {
-                            // وظيفة التسجيل عبر فيسبوك
-                          },
-                        ),
-                        IconButton(
-                          icon:
-                              Icon(Icons.gpp_good_outlined, color: Colors.blue),
-                          onPressed: () {
-                            // وظيفة التسجيل عبر تويتر
-                          },
-                        ),
-                        IconButton(
-                          icon: Icon(Icons.g_mobiledata, color: Colors.red),
-                          onPressed: () {
-                            // وظيفة التسجيل عبر Google+
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-              SizedBox(
-                height: 40,
-              )
-            ],
-          ),
-        ],
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Items'),
       ),
+      body: Column(
+        children: fixedItems.map((item) {
+          return Card(
+            margin: EdgeInsets.all(10.0),
+            child: Column(
+              children: [
+                Text(item.title), // Display item title
+                Image.asset(item.image,height: 50,width: 50,), // Display item image
+                ElevatedButton(
+                  onPressed: () {
+                    _addItem(context, item);
+                  },
+                  child: Text('Add'),
+                ),
+              ],
+            ),
+          );
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class Item {
+  final String title;
+  final String image;
+
+  Item({required this.title, required this.image});
+
+  Map<String, dynamic> toJson() => {
+    'title': title,
+    'image': image,
+  };
+
+  factory Item.fromJson(Map<String, dynamic> json) {
+    return Item(
+      title: json['title'],
+      image: json['image'],
     );
   }
 }

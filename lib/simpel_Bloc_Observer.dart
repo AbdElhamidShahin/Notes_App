@@ -1,19 +1,20 @@
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
 
-class SimpelBlocObserverle implements BlocObserver{
+class SimpelBlocObserverle implements BlocObserver {
   @override
   void onChange(BlocBase bloc, Change change) {
-debugPrint('change = $change');  }
-
-  @override
-  void onClose(BlocBase bloc) {
-    // TODO: implement onClose
+    debugPrint('change = $change');
   }
 
   @override
   void onCreate(BlocBase bloc) {
-    // TODO: implement onCreate
+    debugPrint('create = $bloc');
+  }
+
+  @override
+  void onClose(BlocBase bloc) {
+    debugPrint('close = $bloc');
   }
 
   @override
@@ -30,6 +31,4 @@ debugPrint('change = $change');  }
   void onTransition(Bloc bloc, Transition transition) {
     // TODO: implement onTransition
   }
-
-
 }

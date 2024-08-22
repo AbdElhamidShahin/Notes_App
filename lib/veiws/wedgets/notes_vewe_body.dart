@@ -13,7 +13,7 @@ class Notes_body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        SizedBox(
+        const  SizedBox(
           height: 50,
         ),
         costom_appbar(

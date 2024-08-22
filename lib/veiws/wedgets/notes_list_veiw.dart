@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:noets_app/veiws/notes_veiw.dart';
 
 import 'notes_item.dart';
 
@@ -12,7 +11,10 @@ class notes_list_weiw extends StatelessWidget {
       child: ListView.builder(
           itemCount: 10,
           itemBuilder: (context, index) {
-            return NoteItem();
+            return Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: NoteItem(),
+            );
           }),
     );
   }
